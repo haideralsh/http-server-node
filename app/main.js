@@ -19,7 +19,7 @@ const server = net.createServer((socket) => {
     const { path } = parseRequestData(data)
 
     let HttpStatusLine = ""
-    let responseHeaders = ""
+    let responseHeaders = withCRLF("")
 
     if (path === "/") {
       HttpStatusLine = withCRLF("HTTP/1.1 200")
