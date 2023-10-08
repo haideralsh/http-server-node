@@ -7,15 +7,27 @@ const CRLF = "\r\n"
 
 const withCRLF = (s) => s + CRLF
 
+const parseRequestData = (data) => {
+  let [startLine] = data.toString().split(CRLF)
+  let path =  startLine.split(" ")[1]
+
+  return { path }
+}
+
 const server = net.createServer((socket) => {
   socket.on("data", (data) => {
-    console.log(`Got a request on localhost:${PORT}`, data.toString())
+    const { path } = parseRequestData(data)
 
-    const HttpStatusLine  =  withCRLF("HTTP/1.1 200")
-    const responseHeaders  =  withCRLF("")
+    let HttpStatusLine = ""
+    let responseHeaders = ""
+
+    if (path === "/") {
+      HttpStatusLine = withCRLF("HTTP/1.1 200")
+    } else {
+      HttpStatusLine = withCRLF("HTTP/1.1 404")
+    }
 
     socket.write(HttpStatusLine + responseHeaders)
-
     socket.end()
   });
 
@@ -25,4 +37,4 @@ const server = net.createServer((socket) => {
   });
 });
 
-server.listen(PORT, "localhost");
+server.listen(4221, "localhost");
