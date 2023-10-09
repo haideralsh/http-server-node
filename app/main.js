@@ -27,28 +27,32 @@ const parseRequestData = (data) => {
   return { path, uri }
 }
 
+
+
+let response = {
+   httpStatusLine : "",
+   contentType : "",
+   contentLength : "",
+   responseHeaders : "",
+   responseBody : "",
+}
+
 const server = net.createServer((socket) => {
   socket.on("data", (data) => {
     const { path, uri } = parseRequestData(data)
 
-    let httpStatusLine = withCRLF("")
-    let contentType = withCRLF("")
-    let contentLength = withCRLF("")
-    let responseBody = withCRLF("")
-    let responseHeaders = withCRLF("")
-
     if (path === "/") {
-      httpStatusLine = withCRLF("HTTP/1.1 200")
+      response.httpStatusLine = "HTTP/1.1 200"
     } else if (path.startsWith("/echo")) {
-      httpStatusLine = withCRLF("HTTP/1.1 200")
-      contentType = withCRLF("Content-Type: text/plain")
-      contentLength = withCRLF(`Content-Length: ${uri.length}`)
-      responseBody = withCRLF(uri)
+      response.httpStatusLine = "HTTP/1.1 200"
+      response.contentType = "Content-Type: text/plain"
+      response.contentLength = `Content-Length: ${uri.length}`
+      response.responseBody = uri
     } else {
-      httpStatusLine = withCRLF("HTTP/1.1 404")
+      response.httpStatusLine = "HTTP/1.1 404"
     }
 
-    socket.write(httpStatusLine + contentType + contentLength  + responseHeaders + responseBody)
+    socket.write(Object.values(response).map(v => withCRLF(v)).join(""))
     socket.end()
   });
 
