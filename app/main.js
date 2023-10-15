@@ -14,6 +14,14 @@ const server = net.createServer((socket) => {
       response.contentType = "Content-Type: text/plain";
       response.contentLength = `Content-Length: ${request.uri.length}`;
       response.responseBody = request.uri;
+    } else if (request.path.startsWith("/user-agent")) {
+      const headers = request.headers;
+      const userAgent = headers["User-Agent"];
+
+      response.httpStatusLine = "HTTP/1.1 200";
+      response.contentType = "Content-Type: text/plain";
+      response.contentLength = `Content-Length: ${userAgent.length}`;
+      response.responseBody = userAgent;
     } else {
       response.httpStatusLine = "HTTP/1.1 404";
     }

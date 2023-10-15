@@ -6,8 +6,18 @@ class RequestParser {
   }
 
   get path() {
-    let [startLine] = this.data.toString().split(CRLF);
+    let [startLine] = this._dataLines;
     return startLine.split(" ")[1];
+  }
+
+  get headers() {
+    const [_, ...headers] = this._dataLines;
+
+    return Object.fromEntries(
+      headers
+        .filter(Boolean)
+        .map((header) => header.split(":").map((s) => s.trim())),
+    );
   }
 
   get base() {
@@ -18,6 +28,11 @@ class RequestParser {
     const parts = this.path.split(`/${this.base}/`);
 
     return parts[parts.length - 1];
+  }
+
+  // private
+  get _dataLines() {
+    return this.data.toString().split(CRLF);
   }
 }
 

@@ -28,9 +28,7 @@ class ResponseFormatter {
   }
 
   format() {
-    return Object.values(this.response)
-      .map((v) => withCRLF(v))
-      .join("");
+    return Object.values(this.response).map(withCRLF).join("");
   }
 }
 
