@@ -1,6 +1,18 @@
 const net = require("net");
 const RequestParser = require("./RequestParser");
 const ResponseFormatter = require("./ResponseFormatter");
+const fs = require("fs");
+const path = require("path");
+
+function parseFlag(flag) {
+  const args = process.argv;
+
+  const directoryFlagIndex = args.indexOf("--directory");
+
+  if (directoryFlagIndex !== -1 && args.length > directoryFlagIndex + 1) {
+    return args[directoryFlagIndex + 1];
+  } else return null;
+}
 
 const server = net.createServer((socket) => {
   socket.on("data", (data) => {
@@ -9,6 +21,25 @@ const server = net.createServer((socket) => {
 
     if (request.path === "/") {
       response.httpStatusLine = "HTTP/1.1 200";
+    } else if (request.path.startsWith("/files")) {
+      const fileName = request.uri;
+      const directory = parseFlag("directory");
+
+      if (directory) {
+        let files = fs.readdirSync(directory);
+
+        if (files.includes(fileName)) {
+          const filePath = path.join(directory, fileName);
+          const content = fs.readFileSync(filePath, { encoding: "utf8" });
+
+          response.httpStatusLine = "HTTP/1.1 200";
+          response.contentType = "Content-Type: application/octet-stream";
+          response.contentLength = `Content-Length: ${content.length}`;
+          response.responseBody = content;
+        } else {
+          response.httpStatusLine = "HTTP/1.1 404";
+        }
+      }
     } else if (request.path.startsWith("/echo")) {
       response.httpStatusLine = "HTTP/1.1 200";
       response.contentType = "Content-Type: text/plain";
