@@ -5,18 +5,6 @@ const fs = require("fs");
 const path = require("path");
 const { parseArgs } = require("util");
 
-function parseDirectoryNameFromFlag() {
-  const parsedResult = parseArgs({
-    options: {
-      directory: {
-        type: "string",
-      },
-    },
-  });
-
-  return parsedResult.values.directory ?? null;
-}
-
 const server = net.createServer((socket) => {
   socket.on("data", (data) => {
     const request = new RequestParser(data);
@@ -86,3 +74,15 @@ const server = net.createServer((socket) => {
 });
 
 server.listen(4221, "localhost");
+
+function parseDirectoryNameFromFlag() {
+  const parsedResult = parseArgs({
+    options: {
+      directory: {
+        type: "string",
+      },
+    },
+  });
+
+  return parsedResult.values.directory ?? null;
+}
