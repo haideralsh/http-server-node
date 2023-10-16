@@ -17,14 +17,15 @@ class ResponseFormatter {
   set contentType(value) {
     this.response.contentType = value;
   }
-  set contentLength(value) {
-    this.response.contentLength = value;
-  }
   set responseHeaders(value) {
     this.response.responseHeaders = value;
   }
+
   set responseBody(value) {
     this.response.responseBody = value;
+    this.response.contentLength = this.response.responseBody.length
+      ? `Content-Length: ${this.response.responseBody.length}`
+      : "";
   }
 
   format() {

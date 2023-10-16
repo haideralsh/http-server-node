@@ -34,7 +34,6 @@ const server = net.createServer((socket) => {
 
           response.httpStatusLine = "HTTP/1.1 200";
           response.contentType = "Content-Type: application/octet-stream";
-          response.contentLength = `Content-Length: ${content.length}`;
           response.responseBody = content;
         } else {
           response.httpStatusLine = "HTTP/1.1 404";
@@ -43,7 +42,6 @@ const server = net.createServer((socket) => {
     } else if (request.path.startsWith("/echo")) {
       response.httpStatusLine = "HTTP/1.1 200";
       response.contentType = "Content-Type: text/plain";
-      response.contentLength = `Content-Length: ${request.uri.length}`;
       response.responseBody = request.uri;
     } else if (request.path.startsWith("/user-agent")) {
       const headers = request.headers;
@@ -51,7 +49,6 @@ const server = net.createServer((socket) => {
 
       response.httpStatusLine = "HTTP/1.1 200";
       response.contentType = "Content-Type: text/plain";
-      response.contentLength = `Content-Length: ${userAgent.length}`;
       response.responseBody = userAgent;
     } else {
       response.httpStatusLine = "HTTP/1.1 404";
