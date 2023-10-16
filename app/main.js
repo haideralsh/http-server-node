@@ -3,15 +3,18 @@ const RequestParser = require("./RequestParser");
 const ResponseFormatter = require("./ResponseFormatter");
 const fs = require("fs");
 const path = require("path");
+const { parseArgs } = require("util");
 
-function parseFlag(flag) {
-  const args = process.argv;
+function parseDirectoryNameFromFlag() {
+  const parsedResult = parseArgs({
+    options: {
+      directory: {
+        type: "string",
+      },
+    },
+  });
 
-  const directoryFlagIndex = args.indexOf("--directory");
-
-  if (directoryFlagIndex !== -1 && args.length > directoryFlagIndex + 1) {
-    return args[directoryFlagIndex + 1];
-  } else return null;
+  return parsedResult.values.directory ?? null;
 }
 
 const server = net.createServer((socket) => {
@@ -23,13 +26,12 @@ const server = net.createServer((socket) => {
       response.httpStatusLine = "HTTP/1.1 200";
     } else if (request.path.startsWith("/files")) {
       const fileName = request.uri;
-      const directory = parseFlag("directory");
+      const directoryName = parseDirectoryNameFromFlag();
 
-      if (directory) {
-        let files = fs.readdirSync(directory);
-
+      if (directoryName) {
+        let files = fs.readdirSync(directoryName);
         if (files.includes(fileName)) {
-          const filePath = path.join(directory, fileName);
+          const filePath = path.join(directoryName, fileName);
           const content = fs.readFileSync(filePath, { encoding: "utf8" });
 
           response.httpStatusLine = "HTTP/1.1 200";
@@ -38,6 +40,10 @@ const server = net.createServer((socket) => {
         } else {
           response.httpStatusLine = "HTTP/1.1 404";
         }
+      } else {
+        console.error(
+          `Missing --directory flag. Pass a directory name using the "--directory" flag`,
+        );
       }
     } else if (request.path.startsWith("/echo")) {
       response.httpStatusLine = "HTTP/1.1 200";
