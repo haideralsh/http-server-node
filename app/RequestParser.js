@@ -30,6 +30,15 @@ class RequestParser {
     return parts[parts.length - 1];
   }
 
+  get method() {
+    let [startLine] = this._dataLines;
+    return startLine.split(" ")[0];
+  }
+
+  get body() {
+    return this._dataLines[this._dataLines.length - 1];
+  }
+
   // private
   get _dataLines() {
     return this.data.toString().split(CRLF);

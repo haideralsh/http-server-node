@@ -25,25 +25,40 @@ const server = net.createServer((socket) => {
     if (request.path === "/") {
       response.httpStatusLine = "HTTP/1.1 200";
     } else if (request.path.startsWith("/files")) {
-      const fileName = request.uri;
       const directoryName = parseDirectoryNameFromFlag();
-
-      if (directoryName) {
-        let files = fs.readdirSync(directoryName);
-        if (files.includes(fileName)) {
-          const filePath = path.join(directoryName, fileName);
-          const content = fs.readFileSync(filePath, { encoding: "utf8" });
-
-          response.httpStatusLine = "HTTP/1.1 200";
-          response.contentType = "Content-Type: application/octet-stream";
-          response.responseBody = content;
-        } else {
-          response.httpStatusLine = "HTTP/1.1 404";
-        }
-      } else {
+      if (!directoryName) {
         console.error(
           `Missing --directory flag. Pass a directory name using the "--directory" flag`,
         );
+
+        return;
+      }
+
+      const fileName = request.uri;
+      const method = request.method;
+      const files = fs.readdirSync(directoryName);
+
+      switch (method) {
+        case "GET":
+          if (files.includes(fileName)) {
+            const filePath = path.join(directoryName, fileName);
+            const content = fs.readFileSync(filePath, { encoding: "utf8" });
+
+            response.httpStatusLine = "HTTP/1.1 200";
+            response.contentType = "Content-Type: application/octet-stream";
+            response.responseBody = content;
+          } else {
+            response.httpStatusLine = "HTTP/1.1 404";
+          }
+          break;
+
+        case "POST":
+          const requestBody = request.body;
+          const filePath = path.join(directoryName, fileName);
+          fs.writeFileSync(filePath, requestBody, { encoding: "utf8" });
+
+          response.httpStatusLine = "HTTP/1.1 201";
+          break;
       }
     } else if (request.path.startsWith("/echo")) {
       response.httpStatusLine = "HTTP/1.1 200";
