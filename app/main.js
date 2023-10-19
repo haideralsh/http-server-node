@@ -13,7 +13,6 @@ const {
 const server = net.createServer((socket) => {
   socket.on("data", (data) => {
     const request = new RequestParser(data);
-
     const router = new Router({ request });
 
     router.add("GET", "/", handleRoot);

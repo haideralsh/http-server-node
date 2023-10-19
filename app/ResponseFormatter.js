@@ -1,15 +1,16 @@
 const { withCRLF } = require("./crlf");
 
 class ResponseFormatter {
-  response = {
-    httpStatusLine: "",
-    contentType: "",
-    contentLength: "",
-    responseHeaders: "",
-    responseBody: "",
-  };
-
-  constructor() {}
+  constructor(response = {}) {
+    this.response = {
+      httpStatusLine: "",
+      contentType: "",
+      contentLength: "",
+      responseHeaders: "",
+      responseBody: "",
+      ...response,
+    };
+  }
 
   set httpStatusLine(value) {
     this.response.httpStatusLine = value;
