@@ -1,32 +1,34 @@
-const fs = require("fs");
-const path = require("path");
-const { parseDirectoryNameFromFlag } = require("./lib");
+import fs from "fs";
+import path from "path";
+import { parseDirectoryNameFromFlag } from "./lib";
+import Request from "./Request";
+import ResponseFormatter from "./ResponseFormatter";
 
-function handleNotFound(_, response) {
+export type RequestHandler = (request: Request, response: ResponseFormatter) => void;
+
+export const notFound: RequestHandler = (_, response) => {
   response.httpStatusLine = "HTTP/1.1 404";
-}
+};
 
-function handleUserAgent(request, response) {
+export const userAgent: RequestHandler = (request, response) => {
   const headers = request.headers;
   const userAgent = headers["User-Agent"];
 
   response.httpStatusLine = "HTTP/1.1 200";
   response.contentType = "Content-Type: text/plain";
   response.responseBody = userAgent;
-}
+};
 
-function handleEcho(request, response) {
+export const echo: RequestHandler = (request, response) => {
   response.httpStatusLine = "HTTP/1.1 200";
   response.contentType = "Content-Type: text/plain";
   response.responseBody = request.uri;
-}
+};
 
-function handleReadFile(request, response) {
+export const readFile: RequestHandler = (request, response) => {
   const directoryName = parseDirectoryNameFromFlag();
   if (!directoryName) {
-    console.error(
-      `Missing --directory flag. Pass a directory name using the "--directory" flag`
-    );
+    console.error(`Missing --directory flag. Pass a directory name using the "--directory" flag`);
 
     return;
   }
@@ -44,14 +46,12 @@ function handleReadFile(request, response) {
   } else {
     response.httpStatusLine = "HTTP/1.1 404";
   }
-}
+};
 
-function handleWriteFile(request, response) {
+export const writeFile: RequestHandler = (request, response) => {
   const directoryName = parseDirectoryNameFromFlag();
   if (!directoryName) {
-    console.error(
-      `Missing --directory flag. Pass a directory name using the "--directory" flag`
-    );
+    console.error(`Missing --directory flag. Pass a directory name using the "--directory" flag`);
 
     return;
   }
@@ -63,17 +63,8 @@ function handleWriteFile(request, response) {
   fs.writeFileSync(filePath, requestBody, { encoding: "utf8" });
 
   response.httpStatusLine = "HTTP/1.1 201";
-}
+};
 
-function handleRoot(_, response) {
+export const root: RequestHandler = (_, response) => {
   response.httpStatusLine = "HTTP/1.1 200";
-}
-
-module.exports = {
-  handleEcho,
-  handleRoot,
-  handleNotFound,
-  handleReadFile,
-  handleWriteFile,
-  handleUserAgent,
 };

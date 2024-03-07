@@ -1,6 +1,6 @@
-const { parseArgs } = require("util");
+import { parseArgs } from "util";
 
-function parseDirectoryNameFromFlag() {
+export function parseDirectoryNameFromFlag() {
   const parsedResult = parseArgs({
     options: {
       directory: {
@@ -11,5 +11,3 @@ function parseDirectoryNameFromFlag() {
 
   return parsedResult.values.directory ?? null;
 }
-
-module.exports = { parseDirectoryNameFromFlag };
