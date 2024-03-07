@@ -33,19 +33,20 @@ export const readFile: RequestHandler = (request, response) => {
     return;
   }
 
-  const fileName = request.uri;
   const files = fs.readdirSync(directoryName);
+  const fileName = request.uri;
 
-  if (files.includes(fileName)) {
-    const filePath = path.join(directoryName, fileName);
-    const content = fs.readFileSync(filePath, { encoding: "utf8" });
-
-    response.httpStatusLine = "HTTP/1.1 200";
-    response.contentType = "Content-Type: application/octet-stream";
-    response.responseBody = content;
-  } else {
+  if (!files.includes(fileName)) {
     response.httpStatusLine = "HTTP/1.1 404";
+    return;
   }
+
+  const filePath = path.join(directoryName, fileName);
+  const content = fs.readFileSync(filePath, { encoding: "utf8" });
+
+  response.httpStatusLine = "HTTP/1.1 200";
+  response.contentType = "Content-Type: application/octet-stream";
+  response.responseBody = content;
 };
 
 export const writeFile: RequestHandler = (request, response) => {
