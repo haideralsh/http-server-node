@@ -25,7 +25,7 @@ export default class Request {
   get uri() {
     const parts = this.path.split(`/${this.base}/`);
 
-    return parts[parts.length - 1];
+    return parts.at(-1);
   }
 
   get method() {
@@ -34,7 +34,7 @@ export default class Request {
   }
 
   get body() {
-    return this.dataLines[this.dataLines.length - 1];
+    return this.dataLines.at(-1);
   }
 
   private get dataLines() {
